@@ -1,306 +1,181 @@
-import { DateTime } from 'luxon';
-
 $(document).ready(() => {
+  gsap.registerPlugin(ScrollTrigger, Flip);
+
+  // GSAP IMG SET
+  $('img').each(function () {
+    $(this).removeAttr('loading');
+    ScrollTrigger.refresh();
+  });
+
   // ----- HERO Animation
   ScrollTrigger.matchMedia({
     // Have the animation only on desktop
     '(min-width: 992px)': function () {
-      // Hero Section
-      $('.hero-intro').each(function () {
-        let heroIntro = $(this);
-        let heroWrap = $(this).find('.hero-intro_wrap');
-        let videoBox = $(this).find('.header01_visual-box');
-        let tl = gsap.timeline({
+      // Elems
+      let cards = $('.hp-flow_visual-card');
+      let tags = $('.hp-flow_tags');
+      let stats = $('.hp-flow_stats');
+      let clients = $('.hp-flow_clients');
+      let intro = $('.hp-flow_avatar-intro');
+      let actions = $('.hp-flow_avatar-action');
+      let generateBtn = $('.hp-flow_visual-button');
+
+      // Functions
+      const trigger = (trigger, start, end, additionalConfig = {}) => {
+        return gsap.timeline({
           scrollTrigger: {
-            trigger: $(this),
-            start: 'top top',
-            end: 'center top',
-            scrub: 0.2,
+            trigger: $(trigger),
+            start: start,
+            end: end,
             markers: true,
             invalidateOnRefresh: true,
+            yoyo: true,
+            ...additionalConfig,
           },
         });
+      };
 
-        // --- Set Section
-        let videoBoxHeight;
-        let videoBoxWidth;
+      // Animation
+      const cardsReveal = (card) => {
+        let tl = gsap.timeline();
+        let index = cards.index(card);
+        let moves = ['-15em', '-10em', '10em', '5em'];
 
-        function setSectionHeight() {
-          $(heroIntro).height(heroWrap.height() * 2);
-          videoBoxHeight = $('.header01_visual-split').height();
-          videoBoxWidth = $('.header01_visual-split').width();
-        }
-
-        function setVideoWidth() {
-          let paddingGlobal = gsap.getProperty('.padding-global', 'padding-left') * 2;
-          return videoBoxWidth + paddingGlobal;
-        }
-
-        function calculateVideoMove() {
-          let topHeight = $(heroIntro).find('.section').eq(0).outerHeight();
-          topHeight *= -1;
-          console.log(topHeight);
-          return topHeight - 4;
-        }
-
-        // Load
-        setSectionHeight();
-
-        // Resize
-        $(window).resize(() => {
-          if ($(window).width() >= 992) {
-            setSectionHeight();
-            $(videoBox).width(() => {
-              return setVideoWidth();
-            });
-            $(videoBox).css({
-              transform: `translate(${() => {
-                return calculateVideoMove();
-              }})`,
-            });
-          } else {
-            $(heroIntro, videoBox).attr('style', '');
-          }
-        });
-
-        // --- Create the Animation
         tl.fromTo(
-          videoBox,
+          card,
           {
-            height: '101svh',
-            width: () => {
-              return '101svw';
-            },
-            y: () => {
-              return calculateVideoMove();
-            },
+            opacity: 0,
+            x: moves[index],
           },
           {
-            height: () => {
-              return videoBoxHeight;
-            },
-            width: () => {
-              return videoBoxWidth;
-            },
-            y: 0,
+            x: 0,
+            opacity: 1,
+            duration: 0.75,
           }
         );
-        tl.fromTo(
-          '.nav',
-          {
-            color: 'rgba(255, 255, 255, 1)',
-            borderColor: 'rgba(234, 236, 240, 0)',
-            backgroundColor: 'rgba(255, 255, 255, 0)',
+
+        return tl;
+      };
+
+      let tl = gsap.timeline();
+
+      // First Step
+      tl.addLabel('Step 1 Starts');
+      // Cards Reveal
+      tl.add(cardsReveal(cards.eq(0)), '<');
+      tl.add(cardsReveal(cards.eq(1)), '<');
+      tl.add(cardsReveal(cards.eq(2)), '<');
+      tl.add(cardsReveal(cards.eq(3)), '<');
+      tl.addLabel('Step 1 Ends');
+      // Second Step
+      tl.addLabel('Step 2 Starts');
+      // Cards Hide
+      tl.to(cards, {
+        opacity: 0,
+        scale: 0.8,
+        stagger: {
+          each: 0.02,
+        },
+        duration: 0.75,
+      });
+      // Left Blocks Reveal
+      tl.fromTo(
+        [tags, stats, clients],
+        {
+          opacity: 0,
+          x: '-5em',
+        },
+        {
+          opacity: 1,
+          x: 0,
+          stagger: {
+            each: 0.2,
           },
-          {
-            keyframes: {
-              '30%': {
-                color: 'rgba(51, 58, 71, 1)',
-              },
-              '50%': {
-                borderColor: 'rgba(234, 236, 240, 1)',
-                backgroundColor: 'rgba(255, 255, 255, 1)',
-              },
+          duration: 0.5,
+        },
+        '<0.5'
+      );
+      // Right Blocks Reveal
+      tl.fromTo(
+        [intro, actions],
+        {
+          opacity: 0,
+          x: '5em',
+        },
+        {
+          opacity: 1,
+          x: 0,
+          stagger: {
+            each: 0.2,
+          },
+          duration: 0.5,
+        },
+        '<'
+      );
+      // Generate Button Reval
+      tl.fromTo(generateBtn, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1 }, '<');
+      tl.addLabel('Step 2 Ends');
+      // Third Step
+      tl.addLabel('Step 3 Starts');
+      // Flip Button
+      tl.fromTo(
+        generateBtn,
+        { width: '22.7em', height: '5.3em', y: 0, x: 0 },
+        { width: '17em', height: '22em', y: '-20em', x: '17em' }
+      );
+      tl.fromTo(
+        '.hp-flow_visual-button-inner',
+        {
+          opacity: 1,
+        },
+        {
+          keyframes: {
+            '4%': {
+              opacity: 0,
             },
           },
-          '<'
-        );
-        tl.to(
-          '.header01_content',
-          {
-            keyframes: {
-              '25%': { opacity: 1 },
-              '50%': { opacity: 0 },
-            },
+        },
+        '<'
+      );
+      tl.fromTo(
+        '.hp-flow_styles-inner',
+        {
+          opacity: 0,
+        },
+        {
+          opacity: 1,
+        }
+      );
+      tl.addLabel('Step 3 Ends');
+
+      // Scroll Trigger
+      let flowContents = document.querySelectorAll('.hp-flow_content');
+
+      flowContents.forEach((content, index) => {
+        // Define the start and end labels for each ScrollTrigger
+        let startLabel = `Step ${index + 1} Starts`;
+        let endLabel = `Step ${index + 1} Ends`;
+
+        ScrollTrigger.create({
+          animation: tl,
+          trigger: content,
+          start: 'center center',
+          // Use the labels in the timeline for each ScrollTrigger
+          markers: true,
+          onEnter: ({ progress, direction, isActive }) => {
+            if (direction === 1) {
+              tl.tweenFromTo(startLabel, endLabel);
+            }
           },
-          '<'
-        );
-        tl.fromTo(
-          '[hero-intro-move]',
-          {
-            y: '5rem',
+          onLeaveBack: ({ progress, direction, isActive }) => {
+            if (direction === -1) {
+              tl.tweenFromTo(endLabel, startLabel);
+            }
           },
-          {
-            y: '0',
-          },
-          '<'
-        );
-
-        // Project the Time and Date
-        var currentDate = new Date();
-
-        // Date
-        var month = currentDate.toLocaleString('en', { month: 'long' });
-        var day = currentDate.getDate();
-        var year = currentDate.getFullYear();
-
-        // Time
-        var { DateTime } = luxon;
-        var userLocalTime = luxon.DateTime.local();
-        var convertedTime = userLocalTime.toUTC().toFormat('HHmm');
-
-        console.log(convertedTime);
-
-        $('[hero-date]').text(`${month} ${day}, ${year}`);
-        $('[hero-time]').text(`${convertedTime}[ZULU]`);
-
-        // Mouse Coordinates
-        $(document).mousemove(function (event) {
-          $('[mouseX]').text(event.clientX);
-          $('[mouseY]').text(event.clientY);
+          // Uncomment this if you want the timeline to reset when it's not in the viewport.
+          // onLeave: () => tl.progress(0)
         });
       });
     },
   });
-  let main;
-
-  // ---- CAPABILITIES
-  const navItems = document.querySelectorAll('.cap_navigation-item');
-  const anchors = $('.cap-anchor_box .cap-anchor')
-    .map(function () {
-      return '#' + $(this).attr('id');
-    })
-    .get();
-
-  const findCurrentAnchorIndex = () => {
-    for (let i = 0; i < navItems.length; i++) {
-      if (navItems[i].classList.contains('w--current')) {
-        return i;
-      }
-    }
-    return -1;
-  };
-
-  const scrollToAnchor = (id) => {
-    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleNavItemClick = (item, index, event) => {
-    if (mobile.matches) {
-      event.preventDefault();
-      event.stopPropagation();
-      navItems.forEach((item) => item.classList.remove('w--current'));
-      item.classList.add('w--current');
-      const slideIndex = index;
-      capSwiper.slideTo(slideIndex);
-    }
-  };
-
-  const mobile = window.matchMedia('(max-width: 991px)');
-  const desktop = window.matchMedia('(min-width: 992px)');
-  let capSwiper = null;
-
-  const swiperMode = () => {
-    const arrowPrev = $('.cap_slider-actions .slider-arrow');
-    arrowPrev.addClass('capabilities-arrow');
-
-    if (desktop.matches) {
-      if (capSwiper) {
-        capSwiper.destroy(true, true);
-        capSwiper = null;
-        $(navItems).removeClass('w--current');
-      }
-    } else if (mobile.matches) {
-      $(navItems).removeClass('w--current');
-      $(navItems).eq(0).addClass('w--current');
-      if (!capSwiper) {
-        capSwiper = new Swiper('.cap_content', {
-          slidesPerView: 1,
-          spaceBetween: 24,
-          speed: 250,
-          observer: true,
-          centeredSlides: true,
-          navigation: {
-            prevEl: '.slider-arrow.prev.capabilities-arrow',
-            nextEl: '.slider-arrow.next.capabilities-arrow',
-          },
-          on: {
-            slideChange: () => {
-              navItems.forEach((item, index) => {
-                if (index === capSwiper.activeIndex) {
-                  item.classList.add('w--current');
-                } else {
-                  item.classList.remove('w--current');
-                }
-              });
-            },
-          },
-        });
-      }
-    }
-  };
-
-  // Events
-  window.addEventListener('load', () => {
-    swiperMode();
-  });
-
-  window.addEventListener('resize', () => {
-    swiperMode();
-  });
-
-  navItems.forEach((item, index) => {
-    item.addEventListener('click', (event) => {
-      handleNavItemClick(item, index, event);
-    });
-  });
-
-  // Desktop Arrows Click
-  $('.cap_slider-actions.desktop .slider-arrow.prev').click(() => {
-    const currentAnchorIndex = findCurrentAnchorIndex();
-    if (currentAnchorIndex > 0) {
-      scrollToAnchor(anchors[currentAnchorIndex - 1]);
-    } else {
-      scrollToAnchor(anchors[anchors.length - 1]);
-    }
-  });
-
-  $('.cap_slider-actions.desktop .slider-arrow.next').click(() => {
-    const currentAnchorIndex = findCurrentAnchorIndex();
-    if (currentAnchorIndex < anchors.length - 1) {
-      scrollToAnchor(anchors[currentAnchorIndex + 1]);
-    } else {
-      scrollToAnchor(anchors[0]);
-    }
-  });
-
-  let arrowLeft = $('.w-icon-slider-left');
-  let arrowRight = $('.w-icon-slider-right');
-  let customArrows = $('.about__investor-arrow');
-
-  customArrows.on('click', function (element) {
-    getDirection(element);
-  });
-
-  function getDirection(element) {
-    customArrows.each(function () {
-      let directionID = $(this).attr('id');
-
-      if (directionID === 'link-left') {
-        if (arrowLeft.is(':hidden')) {
-          $(this).hide();
-        } else {
-          $(this).show();
-        }
-      }
-
-      if (directionID === 'link-right') {
-        if (arrowRight.is(':hidden')) {
-          $(this).hide();
-        } else {
-          $(this).show();
-        }
-      }
-    });
-
-    let clickedDirection = $(element).attr('id');
-    if (clickedDirection === 'link-left') {
-      arrowLeft.click();
-    }
-    if (clickedDirection === 'link-right') {
-      arrowRight.click();
-    }
-  }
-
-  getDirection();
 });
