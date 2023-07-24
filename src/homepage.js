@@ -166,16 +166,6 @@ $(document).ready(() => {
       },
       '<'
     );
-    // Generate Button Reval
-    tl.fromTo(
-      $(parent).find(generateBtn),
-      { opacity: 0, scale: 0.8 },
-      {
-        opacity: 1,
-        scale: 1,
-      },
-      '<'
-    );
 
     return tl;
   };
@@ -233,15 +223,13 @@ $(document).ready(() => {
       },
       '<'
     );
-    // Flip Button
+    // Generate Button Reval
     tl.fromTo(
       $(parent).find(generateBtn),
-      { width: '22.7em', height: '5.3em', y: 0, x: 0 },
+      { opacity: 0, scale: 0.8 },
       {
-        width: '17em',
-        height: '22em',
-        y: '-20em',
-        x: '17em',
+        opacity: 1,
+        scale: 1,
         onComplete: () => {
           updateStylesPerms(true);
         },
@@ -251,29 +239,6 @@ $(document).ready(() => {
         },
       },
       '<'
-    );
-    tl.fromTo(
-      $(parent).find('.hp-flow_visual-button-inner'),
-      {
-        opacity: 1,
-      },
-      {
-        keyframes: {
-          '4%': {
-            opacity: 0,
-          },
-        },
-      },
-      '<'
-    );
-    tl.fromTo(
-      $(parent).find('.hp-flow_styles-inner'),
-      {
-        opacity: 0,
-      },
-      {
-        opacity: 1,
-      }
     );
 
     return tl;
