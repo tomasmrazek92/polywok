@@ -469,6 +469,7 @@ $(document).ready(() => {
   let heroCurrent = 0;
   let heroButton = $('.hp_hero-container-wrap .hp-flow_visual-button');
   let heroVisuals = $('.hp_hero-template');
+  let heroStyleBoxes = $('.hp_hero-container-wrap .hp-flow_styles-bg');
   let heroAnimationTrigger = $('[hero-template]');
   let heroInterval;
 
@@ -478,6 +479,7 @@ $(document).ready(() => {
     heroCurrent = (heroCurrent + 1) % $(heroVisuals).length;
 
     heroVisuals
+      .add(heroStyleBoxes)
       .stop()
       .fadeOut('fast')
       .promise()
@@ -486,7 +488,10 @@ $(document).ready(() => {
         return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
       })
       .then(() => {
-        return heroVisuals.eq(heroCurrent).fadeIn('fast').promise();
+        return Promise.all([
+          heroStyleBoxes.eq(heroCurrent).fadeIn('fast').promise(),
+          heroVisuals.eq(heroCurrent).fadeIn('fast').promise(),
+        ]);
       })
       .then(() => {
         return heroVisuals.eq(heroCurrent).find(heroAnimationTrigger).trigger('click').promise();
@@ -607,15 +612,12 @@ $(document).ready(() => {
     opacity: 0,
   });
   tl1.fromTo(
-    card1Cards,
+    card1Cards.eq(0),
     { x: '-2.4rem', scale: 0.85, opacity: 0 },
     {
       x: 0,
       scale: 1,
       opacity: 1,
-      stagger: {
-        each: 0.2,
-      },
       duration: 0.5,
     }
   );
@@ -647,6 +649,17 @@ $(document).ready(() => {
       },
     },
     '<'
+  );
+  tl1.fromTo(
+    card1Cards.eq(1),
+    { x: '-2.4rem', scale: 0.85, opacity: 0 },
+    {
+      x: 0,
+      scale: 1,
+      opacity: 1,
+      duration: 0.5,
+    },
+    '>-0.4'
   );
   tl1.to(
     $(card1Paragraph).eq(1).find('.char'),
