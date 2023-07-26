@@ -525,11 +525,30 @@ $(document).ready(() => {
     startHeroInterval();
   });
 
+  // Interval on Scroll
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // If the element is in view, start the interval
+        startHeroInterval();
+      } else {
+        // If the element is not in view, clear the interval
+        if (heroInterval) {
+          clearInterval(heroInterval);
+        }
+      }
+    });
+  });
+
+  const targetElement = document.querySelector('.hp_hero-container');
+  observer.observe(targetElement);
+
   // Step 3 - Styles Carousel
   let step3Current = 0;
   let step3StyleButton = $('.hp-flow_visual .hp-flow_visual-button');
   let desktoParent = $('.hp-flow_col.visual');
   let respoParent = $('.hp-flow_content-visual._3');
+  let step3Interval;
 
   function updateStep3Style(reset, parent) {
     let styleVisuals = $(parent).find('.hp-flow_visual-static');
@@ -559,8 +578,6 @@ $(document).ready(() => {
     }
   }
 
-  let step3Interval;
-
   function startStep3Interval(parent) {
     // If interval is already set, clear it.
     if (step3Interval) {
@@ -574,6 +591,7 @@ $(document).ready(() => {
     }, 3000);
   }
 
+  // Click
   step3StyleButton.on('click', () => {
     if (window.matchMedia('(max-width: 991px)').matches) {
       startStep3Interval(respoParent);
