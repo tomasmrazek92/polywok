@@ -468,27 +468,28 @@ $(document).ready(() => {
   // Hero Carousel
   let heroCurrent = 0;
   let heroButton = $('.hp_hero-container-wrap .hp-flow_visual-button');
-  let styleVisuals = $('.hp_hero-template');
+  let heroVisuals = $('.hp_hero-template');
   let heroAnimationTrigger = $('[hero-template]');
+  let heroInterval;
 
   function updateHeroStyle() {
     heroButton.addClass('disabled');
 
-    heroCurrent = (heroCurrent + 1) % $(styleVisuals).length;
+    heroCurrent = (heroCurrent + 1) % $(heroVisuals).length;
 
-    styleVisuals
+    heroVisuals
       .stop()
       .fadeOut('fast')
       .promise()
       .then(() => {
-        let index = heroCurrent === 0 ? styleVisuals.length - 1 : heroCurrent - 1;
-        return styleVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
+        let index = heroCurrent === 0 ? heroVisuals.length - 1 : heroCurrent - 1;
+        return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
       })
       .then(() => {
-        return styleVisuals.eq(heroCurrent).fadeIn('fast').promise();
+        return heroVisuals.eq(heroCurrent).fadeIn('fast').promise();
       })
       .then(() => {
-        return styleVisuals.eq(heroCurrent).find(heroAnimationTrigger).trigger('click').promise();
+        return heroVisuals.eq(heroCurrent).find(heroAnimationTrigger).trigger('click').promise();
       })
       .then(() => {
         return heroButton.removeClass('disabled');
@@ -497,11 +498,26 @@ $(document).ready(() => {
         console.log('An error occurred: ', err);
       });
   }
+  function startHeroInterval() {
+    // If interval is already set, clear it.
+    if (heroInterval) {
+      clearInterval(heroInterval);
+      updateHeroStyle();
+    }
 
-  styleVisuals.eq(0).find(heroAnimationTrigger).trigger('click');
+    // Set interval for function to run every 3 seconds.
+    heroInterval = setInterval(function () {
+      updateHeroStyle();
+    }, 4000);
+  }
 
+  // Actions on Load
+  heroVisuals.eq(0).find(heroAnimationTrigger).trigger('click');
+  startHeroInterval();
+
+  // Clicks
   heroButton.on('click', () => {
-    updateHeroStyle();
+    startHeroInterval();
   });
 
   // Step 3 - Styles Carousel
@@ -538,34 +554,34 @@ $(document).ready(() => {
     }
   }
 
-  let intervalId;
+  let step3Interval;
 
-  function startInterval(parent) {
+  function startStep3Interval(parent) {
     // If interval is already set, clear it.
-    if (intervalId) {
-      clearInterval(intervalId);
+    if (step3Interval) {
+      clearInterval(step3Interval);
       updateStep3Style(false, parent);
     }
 
     // Set interval for function to run every 3 seconds.
-    intervalId = setInterval(function () {
+    step3Interval = setInterval(function () {
       updateStep3Style(false, parent);
     }, 3000);
   }
 
   step3StyleButton.on('click', () => {
     if (window.matchMedia('(max-width: 991px)').matches) {
-      startInterval(respoParent);
+      startStep3Interval(respoParent);
     } else {
-      startInterval(desktoParent);
+      startStep3Interval(desktoParent);
     }
   });
 
   // Call the function to start the interval as soon as the script runs.
   if (window.matchMedia('(max-width: 991px)').matches) {
-    startInterval(respoParent);
+    startStep3Interval(respoParent);
   } else {
-    startInterval(desktoParent);
+    startStep3Interval(desktoParent);
   }
 
   // ----- Cards Animations
