@@ -466,6 +466,7 @@ $(document).ready(() => {
   });
 
   // Hero Carousel
+  let isScrolling;
   let heroCurrent = 0;
   let heroButton = $('.hp_hero-container-wrap .hp-flow_visual-button');
   let heroVisuals = $('.hp_hero-template');
@@ -474,34 +475,36 @@ $(document).ready(() => {
   let heroInterval;
 
   function updateHeroStyle() {
-    heroButton.addClass('disabled');
+    if (!isScrolling) {
+      heroButton.addClass('disabled');
 
-    heroCurrent = (heroCurrent + 1) % $(heroVisuals).length;
+      heroCurrent = (heroCurrent + 1) % $(heroVisuals).length;
 
-    heroVisuals
-      .add(heroStyleBoxes)
-      .stop()
-      .fadeOut('fast')
-      .promise()
-      .then(() => {
-        let index = heroCurrent === 0 ? heroVisuals.length - 1 : heroCurrent - 1;
-        return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
-      })
-      .then(() => {
-        return Promise.all([
-          heroStyleBoxes.eq(heroCurrent).fadeIn('fast').promise(),
-          heroVisuals.eq(heroCurrent).fadeIn('fast').promise(),
-        ]);
-      })
-      .then(() => {
-        return heroVisuals.eq(heroCurrent).find(heroAnimationTrigger).trigger('click').promise();
-      })
-      .then(() => {
-        return heroButton.removeClass('disabled');
-      })
-      .catch((err) => {
-        console.log('An error occurred: ', err);
-      });
+      heroVisuals
+        .add(heroStyleBoxes)
+        .stop()
+        .fadeOut('fast')
+        .promise()
+        .then(() => {
+          let index = heroCurrent === 0 ? heroVisuals.length - 1 : heroCurrent - 1;
+          return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
+        })
+        .then(() => {
+          return Promise.all([
+            heroStyleBoxes.eq(heroCurrent).fadeIn('fast').promise(),
+            heroVisuals.eq(heroCurrent).fadeIn('fast').promise(),
+          ]);
+        })
+        .then(() => {
+          return heroVisuals.eq(heroCurrent).find(heroAnimationTrigger).trigger('click').promise();
+        })
+        .then(() => {
+          return heroButton.removeClass('disabled');
+        })
+        .catch((err) => {
+          console.log('An error occurred: ', err);
+        });
+    }
   }
   function startHeroInterval() {
     // If interval is already set, clear it.
@@ -525,24 +528,6 @@ $(document).ready(() => {
     startHeroInterval();
   });
 
-  // Interval on Scroll
-  const observer = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        // If the element is in view, start the interval
-        startHeroInterval();
-      } else {
-        // If the element is not in view, clear the interval
-        if (heroInterval) {
-          clearInterval(heroInterval);
-        }
-      }
-    });
-  });
-
-  const targetElement = document.querySelector('.hp_hero-container');
-  observer.observe(targetElement);
-
   // Step 3 - Styles Carousel
   let step3Current = 0;
   let step3StyleButton = $('.hp-flow_visual .hp-flow_visual-button');
@@ -551,30 +536,32 @@ $(document).ready(() => {
   let step3Interval;
 
   function updateStep3Style(reset, parent) {
-    let styleVisuals = $(parent).find('.hp-flow_visual-static');
-    let styleBox = $(parent).find('.hp-flow_styles-bg');
+    if (!isScrolling) {
+      let styleVisuals = $(parent).find('.hp-flow_visual-static');
+      let styleBox = $(parent).find('.hp-flow_styles-bg');
 
-    if (reset === true) {
-      if (step3Current === 0) {
-        return; // Return early if already at index 0
+      if (reset === true) {
+        if (step3Current === 0) {
+          return; // Return early if already at index 0
+        }
+        step3Current = 0; // Reset step3Current to 0 index
+      } else {
+        if (allowStyles) {
+          step3Current = (step3Current + 1) % $(styleVisuals).length;
+        }
       }
-      step3Current = 0; // Reset step3Current to 0 index
-    } else {
-      if (allowStyles) {
-        step3Current = (step3Current + 1) % $(styleVisuals).length;
-      }
-    }
 
-    if (allowStyles || reset === true) {
-      styleVisuals
-        .add(styleBox)
-        .stop()
-        .fadeOut('fast')
-        .promise()
-        .done(function () {
-          styleVisuals.eq(step3Current).fadeIn();
-          styleBox.eq(step3Current).fadeIn();
-        });
+      if (allowStyles || reset === true) {
+        styleVisuals
+          .add(styleBox)
+          .stop()
+          .fadeOut('fast')
+          .promise()
+          .done(function () {
+            styleVisuals.eq(step3Current).fadeIn();
+            styleBox.eq(step3Current).fadeIn();
+          });
+      }
     }
   }
 
@@ -607,66 +594,34 @@ $(document).ready(() => {
     startStep3Interval(desktoParent);
   }
 
-  // Scroll Click Fix
-  let isScrolling = false;
+  // Scroll Fix
+  let debounceTimer;
 
-  // Debounce function
-  function debounce(func, wait, immediate) {
-    var timeout;
-    return function () {
-      var context = this,
-        args = arguments;
-      var later = function () {
-        timeout = null;
-        if (!immediate) func.apply(context, args);
-      };
-      var callNow = immediate && !timeout;
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-      if (callNow) func.apply(context, args);
-    };
+  // Function to be called after scrolling stops
+  function hasStoppedScrolling() {
+    // No more scrolling
+    isScrolling = false;
+    console.log('Scrolling has stopped.'); // For debugging purposes
   }
 
-  // start scrolling events
+  // Listen for scroll events
   window.addEventListener(
     'scroll',
-    debounce(function () {
-      console.log('Scrolling...'); // For debugging purpose
-      if (step3Interval) {
-        clearInterval(step3Interval);
-        step3Interval = null;
-      }
-      if (heroInterval) {
-        clearInterval(heroInterval);
-        heroInterval = null;
-      }
+    function () {
+      // Scrolling is happening
       if (!isScrolling) {
-        isScrolling = setTimeout(() => {
-          isScrolling = null;
-          console.log('Stopped scrolling');
-          if (window.matchMedia('(max-width: 991px)').matches) {
-            startStep3Interval(respoParent);
-          } else {
-            startStep3Interval(desktoParent);
-          }
-          startHeroInterval();
-        }, 200);
-      } else {
-        clearTimeout(isScrolling);
-        isScrolling = setTimeout(() => {
-          isScrolling = null;
-          console.log('Stopped scrolling');
-          if (window.matchMedia('(max-width: 991px)').matches) {
-            startStep3Interval(respoParent);
-          } else {
-            startStep3Interval(desktoParent);
-          }
-          startHeroInterval();
-        }, 200);
+        console.log('Scrolling...'); // For debugging purposes
+        isScrolling = true;
       }
-    }, 50),
+
+      // Clear the timeout if it's already been set.
+      clearTimeout(debounceTimer);
+
+      // Set a timeout to run after scrolling ends
+      debounceTimer = setTimeout(hasStoppedScrolling, 100);
+    },
     false
-  ); // Adjust the debounce time as needed
+  );
 
   // ----- Cards Animations
   // Card 1
