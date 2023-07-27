@@ -607,6 +607,67 @@ $(document).ready(() => {
     startStep3Interval(desktoParent);
   }
 
+  // Scroll Click Fix
+  let isScrolling = false;
+
+  // Debounce function
+  function debounce(func, wait, immediate) {
+    var timeout;
+    return function () {
+      var context = this,
+        args = arguments;
+      var later = function () {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      var callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
+  }
+
+  // start scrolling events
+  window.addEventListener(
+    'scroll',
+    debounce(function () {
+      console.log('Scrolling...'); // For debugging purpose
+      if (step3Interval) {
+        clearInterval(step3Interval);
+        step3Interval = null;
+      }
+      if (heroInterval) {
+        clearInterval(heroInterval);
+        heroInterval = null;
+      }
+      if (!isScrolling) {
+        isScrolling = setTimeout(() => {
+          isScrolling = null;
+          console.log('Stopped scrolling');
+          if (window.matchMedia('(max-width: 991px)').matches) {
+            startStep3Interval(respoParent);
+          } else {
+            startStep3Interval(desktoParent);
+          }
+          startHeroInterval();
+        }, 200);
+      } else {
+        clearTimeout(isScrolling);
+        isScrolling = setTimeout(() => {
+          isScrolling = null;
+          console.log('Stopped scrolling');
+          if (window.matchMedia('(max-width: 991px)').matches) {
+            startStep3Interval(respoParent);
+          } else {
+            startStep3Interval(desktoParent);
+          }
+          startHeroInterval();
+        }, 200);
+      }
+    }, 50),
+    false
+  ); // Adjust the debounce time as needed
+
   // ----- Cards Animations
   // Card 1
   let card1Cards = $('[card1-card]');
