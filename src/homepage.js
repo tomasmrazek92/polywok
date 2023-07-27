@@ -618,7 +618,7 @@ $(document).ready(() => {
       clearTimeout(debounceTimer);
 
       // Set a timeout to run after scrolling ends
-      debounceTimer = setTimeout(hasStoppedScrolling, 500);
+      debounceTimer = setTimeout(hasStoppedScrolling, 2000);
     },
     false
   );
