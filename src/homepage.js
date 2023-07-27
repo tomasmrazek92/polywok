@@ -789,7 +789,7 @@ $(document).ready(() => {
 
     let split = new SplitType(container, { types: 'words' });
 
-    // Animate the characters
+    /* Animate the characters
     let tl = gsap.timeline();
     tl.fromTo(
       $(split.words),
@@ -807,6 +807,7 @@ $(document).ready(() => {
         },
       }
     );
+    */
   }
 
   typeNextUrl(); // Start typing
