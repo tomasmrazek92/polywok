@@ -769,17 +769,19 @@ $(document).ready(() => {
         ease: 'power2',
         stagger: 0.05,
         onComplete: () => {
-          // Setup a ticker to check for scrolling
-          let myTicker = gsap.ticker.add(function () {
-            // Check if isScrolling is false
+          // Function to check if isScrolling is false
+          function checkScrolling() {
             if (!isScrolling) {
-              // Remove the ticker to stop the loop
-              myTicker.kill();
+              // Remove the function to stop the loop
+              gsap.ticker.remove(checkScrolling);
 
               // Wait for 1 second before typing the next URL
               gsap.delayedCall(1, typeNextUrl);
             }
-          });
+          }
+
+          // Add the function to the ticker
+          gsap.ticker.add(checkScrolling);
         },
       }
     );
