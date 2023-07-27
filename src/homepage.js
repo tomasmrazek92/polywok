@@ -475,36 +475,34 @@ $(document).ready(() => {
   let heroInterval;
 
   function updateHeroStyle() {
-    if (!isScrolling) {
-      heroButton.addClass('disabled');
+    heroButton.addClass('disabled');
 
-      heroCurrent = (heroCurrent + 1) % $(heroVisuals).length;
+    heroCurrent = (heroCurrent + 1) % $(heroVisuals).length;
 
-      heroVisuals
-        .add(heroStyleBoxes)
-        .stop()
-        .fadeOut('fast')
-        .promise()
-        .then(() => {
-          let index = heroCurrent === 0 ? heroVisuals.length - 1 : heroCurrent - 1;
-          return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
-        })
-        .then(() => {
-          return Promise.all([
-            heroStyleBoxes.eq(heroCurrent).fadeIn('fast').promise(),
-            heroVisuals.eq(heroCurrent).fadeIn('fast').promise(),
-          ]);
-        })
-        .then(() => {
-          return heroVisuals.eq(heroCurrent).find(heroAnimationTrigger).trigger('click').promise();
-        })
-        .then(() => {
-          return heroButton.removeClass('disabled');
-        })
-        .catch((err) => {
-          console.log('An error occurred: ', err);
-        });
-    }
+    heroVisuals
+      .add(heroStyleBoxes)
+      .stop()
+      .fadeOut('fast')
+      .promise()
+      .then(() => {
+        let index = heroCurrent === 0 ? heroVisuals.length - 1 : heroCurrent - 1;
+        return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
+      })
+      .then(() => {
+        return Promise.all([
+          heroStyleBoxes.eq(heroCurrent).fadeIn('fast').promise(),
+          heroVisuals.eq(heroCurrent).fadeIn('fast').promise(),
+        ]);
+      })
+      .then(() => {
+        return heroVisuals.eq(heroCurrent).find(heroAnimationTrigger).trigger('click').promise();
+      })
+      .then(() => {
+        return heroButton.removeClass('disabled');
+      })
+      .catch((err) => {
+        console.log('An error occurred: ', err);
+      });
   }
   function startHeroInterval() {
     // If interval is already set, clear it.
@@ -536,32 +534,30 @@ $(document).ready(() => {
   let step3Interval;
 
   function updateStep3Style(reset, parent) {
-    if (!isScrolling) {
-      let styleVisuals = $(parent).find('.hp-flow_visual-static');
-      let styleBox = $(parent).find('.hp-flow_styles-bg');
+    let styleVisuals = $(parent).find('.hp-flow_visual-static');
+    let styleBox = $(parent).find('.hp-flow_styles-bg');
 
-      if (reset === true) {
-        if (step3Current === 0) {
-          return; // Return early if already at index 0
-        }
-        step3Current = 0; // Reset step3Current to 0 index
-      } else {
-        if (allowStyles) {
-          step3Current = (step3Current + 1) % $(styleVisuals).length;
-        }
+    if (reset === true) {
+      if (step3Current === 0) {
+        return; // Return early if already at index 0
       }
+      step3Current = 0; // Reset step3Current to 0 index
+    } else {
+      if (allowStyles) {
+        step3Current = (step3Current + 1) % $(styleVisuals).length;
+      }
+    }
 
-      if (allowStyles || reset === true) {
-        styleVisuals
-          .add(styleBox)
-          .stop()
-          .fadeOut('fast')
-          .promise()
-          .done(function () {
-            styleVisuals.eq(step3Current).fadeIn();
-            styleBox.eq(step3Current).fadeIn();
-          });
-      }
+    if (allowStyles || reset === true) {
+      styleVisuals
+        .add(styleBox)
+        .stop()
+        .fadeOut('fast')
+        .promise()
+        .done(function () {
+          styleVisuals.eq(step3Current).fadeIn();
+          styleBox.eq(step3Current).fadeIn();
+        });
     }
   }
 
@@ -593,35 +589,6 @@ $(document).ready(() => {
   } else {
     startStep3Interval(desktoParent);
   }
-
-  // Scroll Fix
-  let debounceTimer;
-
-  // Function to be called after scrolling stops
-  function hasStoppedScrolling() {
-    // No more scrolling
-    isScrolling = false;
-    console.log('Scrolling has stopped.'); // For debugging purposes
-  }
-
-  // Listen for scroll events
-  window.addEventListener(
-    'scroll',
-    function () {
-      // Scrolling is happening
-      if (!isScrolling) {
-        console.log('Scrolling...'); // For debugging purposes
-        isScrolling = true;
-      }
-
-      // Clear the timeout if it's already been set.
-      clearTimeout(debounceTimer);
-
-      // Set a timeout to run after scrolling ends
-      debounceTimer = setTimeout(hasStoppedScrolling, 100);
-    },
-    false
-  );
 
   // ----- Cards Animations
   // Card 1
@@ -773,42 +740,70 @@ $(document).ready(() => {
   let parentContainer = document.querySelector('.hp-feature-4_address-inner');
 
   function typeNextUrl() {
-    if (urlIndex >= urls.length) {
-      urlIndex = 0; // Restart from the first URL
-    }
-
-    let url = urls[urlIndex++];
-
-    // Create a new container for each URL
-    let container = document.createElement('div');
-    container.textContent = url;
-
-    // Append the new container to the parent container
-    parentContainer.innerHTML = '';
-    parentContainer.appendChild(container);
-
-    let split = new SplitType(container, { types: 'words' });
-
-    /* Animate the characters
-    let tl = gsap.timeline();
-    tl.fromTo(
-      $(split.words),
-      {
-        display: 'none',
-      },
-      {
-        display: 'inline-block',
-        visibility: 'visible',
-        ease: 'power2',
-        stagger: 0.05,
-        onComplete: () => {
-          // Wait for 1 second before typing the next URL
-          gsap.delayedCall(1, typeNextUrl);
-        },
+    if (!isScrolling) {
+      if (urlIndex >= urls.length) {
+        urlIndex = 0; // Restart from the first URL
       }
-    );
-    */
+
+      let url = urls[urlIndex++];
+
+      // Create a new container for each URL
+      let container = document.createElement('div');
+      container.textContent = url;
+
+      // Append the new container to the parent container
+      parentContainer.innerHTML = '';
+      parentContainer.appendChild(container);
+
+      let split = new SplitType(container, { types: 'chars' });
+
+      // Animate the characters
+      let tl = gsap.timeline();
+      tl.fromTo(
+        $(split.chars),
+        {
+          display: 'none',
+        },
+        {
+          display: 'inline-block',
+          visibility: 'visible',
+          ease: 'power2',
+          stagger: 0.05,
+          onComplete: () => {
+            // Wait for 1 second before typing the next URL
+            gsap.delayedCall(1, typeNextUrl);
+          },
+        }
+      );
+    }
   }
 
   typeNextUrl(); // Start typing
+
+  // Scroll Fix
+  let debounceTimer;
+
+  // Function to be called after scrolling stops
+  function hasStoppedScrolling() {
+    // No more scrolling
+    isScrolling = false;
+  }
+
+  // Listen for scroll events
+  window.addEventListener(
+    'scroll',
+    function () {
+      // Scrolling is happening
+      if (!isScrolling) {
+        isScrolling = true;
+      }
+
+      // Clear the timeout if it's already been set.
+      clearTimeout(debounceTimer);
+
+      // Set a timeout to run after scrolling ends
+      debounceTimer = setTimeout(hasStoppedScrolling, 500);
+    },
+    false
+  );
 });
