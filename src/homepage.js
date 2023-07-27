@@ -740,42 +740,49 @@ $(document).ready(() => {
   let parentContainer = document.querySelector('.hp-feature-4_address-inner');
 
   function typeNextUrl() {
-    if (!isScrolling) {
-      if (urlIndex >= urls.length) {
-        urlIndex = 0; // Restart from the first URL
-      }
-
-      let url = urls[urlIndex++];
-
-      // Create a new container for each URL
-      let container = document.createElement('div');
-      container.textContent = url;
-
-      // Append the new container to the parent container
-      parentContainer.innerHTML = '';
-      parentContainer.appendChild(container);
-
-      let split = new SplitType(container, { types: 'chars' });
-
-      // Animate the characters
-      let tl = gsap.timeline();
-      tl.fromTo(
-        $(split.chars),
-        {
-          display: 'none',
-        },
-        {
-          display: 'inline-block',
-          visibility: 'visible',
-          ease: 'power2',
-          stagger: 0.05,
-          onComplete: () => {
-            // Wait for 1 second before typing the next URL
-            gsap.delayedCall(1, typeNextUrl);
-          },
-        }
-      );
+    if (urlIndex >= urls.length) {
+      urlIndex = 0; // Restart from the first URL
     }
+
+    let url = urls[urlIndex++];
+
+    // Create a new container for each URL
+    let container = document.createElement('div');
+    container.textContent = url;
+
+    // Append the new container to the parent container
+    parentContainer.innerHTML = '';
+    parentContainer.appendChild(container);
+
+    let split = new SplitType(container, { types: 'chars' });
+
+    // Animate the characters
+    let tl = gsap.timeline();
+    tl.fromTo(
+      $(split.chars),
+      {
+        display: 'none',
+      },
+      {
+        display: 'inline-block',
+        visibility: 'visible',
+        ease: 'power2',
+        stagger: 0.05,
+        onComplete: () => {
+          // Setup a ticker to check for scrolling
+          let myTicker = gsap.ticker.add(function () {
+            // Check if isScrolling is false
+            if (!isScrolling) {
+              // Remove the ticker to stop the loop
+              myTicker.kill();
+
+              // Wait for 1 second before typing the next URL
+              gsap.delayedCall(1, typeNextUrl);
+            }
+          });
+        },
+      }
+    );
   }
 
   typeNextUrl(); // Start typing
