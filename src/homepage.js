@@ -618,7 +618,7 @@ $(document).ready(() => {
       clearTimeout(debounceTimer);
 
       // Set a timeout to run after scrolling ends
-      debounceTimer = setTimeout(hasStoppedScrolling, 2000);
+      debounceTimer = setTimeout(hasStoppedScrolling, 100);
     },
     false
   );
@@ -787,12 +787,12 @@ $(document).ready(() => {
     parentContainer.innerHTML = '';
     parentContainer.appendChild(container);
 
-    let split = new SplitType(container, { types: 'chars' });
+    let split = new SplitType(container, { types: 'words' });
 
     // Animate the characters
     let tl = gsap.timeline();
     tl.fromTo(
-      $(split.chars),
+      $(split.words),
       {
         display: 'none',
       },
