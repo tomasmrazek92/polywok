@@ -726,13 +726,7 @@ $(document).ready(() => {
   });
 
   // Card 4
-  let urls = [
-    'www.google.com',
-    'www.youtube.com',
-    'www.tesla.com',
-    'www.apple.com',
-    'www.webflow.com',
-  ];
+  let urls = ['ai', 'io', 'net'];
 
   let urlIndex = 0;
   let split;
