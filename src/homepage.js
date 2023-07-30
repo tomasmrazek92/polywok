@@ -726,7 +726,7 @@ $(document).ready(() => {
   });
 
   // Card 4
-  let urls = ['ai', 'io', 'net'];
+  let urls = ['leighmichaels.ai', 'leighmichaels.io', 'leighmichaels.net'];
 
   let urlIndex = 0;
   let split;
