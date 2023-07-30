@@ -761,7 +761,7 @@ $(document).ready(() => {
         display: 'inline-block',
         visibility: 'visible',
         ease: 'power2',
-        stagger: 0.05,
+        stagger: 0.1,
         onComplete: () => {
           // Function to check if isScrolling is false
           function checkScrolling() {
