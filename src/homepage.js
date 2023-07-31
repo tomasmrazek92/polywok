@@ -245,7 +245,7 @@ $(document).ready(() => {
     let tl = gsap.timeline();
     // Device Flip
     tl.fromTo(
-      $(parent).find(dashboard),
+      [$(parent).find(dashboard), '.hp-flow_desktop-lottie'],
       {
         display: 'block',
         opacity: 1,
@@ -259,7 +259,7 @@ $(document).ready(() => {
       }
     );
     tl.fromTo(
-      $(parent).find(phone),
+      [$(parent).find(phone), '.hp-flow_mobile-lottie'],
       {
         display: 'none',
         opacity: 0,
