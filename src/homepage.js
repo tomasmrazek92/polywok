@@ -474,39 +474,36 @@ $(document).ready(() => {
   let heroInterval;
 
   function updateHeroStyle() {
-    heroButton.addClass('disabled');
+    if (!$('html, body').hasClass('overflow-hidden')) {
+      heroButton.addClass('disabled');
 
-    heroCurrent = (heroCurrent + 1) % $(heroVisuals).length;
+      heroCurrent = (heroCurrent + 1) % $(heroVisuals).length;
 
-    heroVisuals
-      .add(heroStyleBoxes)
-      .stop()
-      .fadeOut('fast')
-      .promise()
-      .then(() => {
-        let index = heroCurrent === 0 ? heroVisuals.length - 1 : heroCurrent - 1;
-        if (!$('html, body').hasClass('overflow-hidden')) {
-          console.log(index);
+      heroVisuals
+        .add(heroStyleBoxes)
+        .stop()
+        .fadeOut('fast')
+        .promise()
+        .then(() => {
+          let index = heroCurrent === 0 ? heroVisuals.length - 1 : heroCurrent - 1;
           return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
-        }
-      })
-      .then(() => {
-        return Promise.all([
-          heroStyleBoxes.eq(heroCurrent).fadeIn('fast').promise(),
-          heroVisuals.eq(heroCurrent).fadeIn('fast').promise(),
-        ]);
-      })
-      .then(() => {
-        if (!$('html, body').hasClass('overflow-hidden')) {
+        })
+        .then(() => {
+          return Promise.all([
+            heroStyleBoxes.eq(heroCurrent).fadeIn('fast').promise(),
+            heroVisuals.eq(heroCurrent).fadeIn('fast').promise(),
+          ]);
+        })
+        .then(() => {
           return heroVisuals.eq(heroCurrent).find(heroAnimationTrigger).trigger('click').promise();
-        }
-      })
-      .then(() => {
-        return heroButton.removeClass('disabled');
-      })
-      .catch((err) => {
-        console.log('An error occurred: ', err);
-      });
+        })
+        .then(() => {
+          return heroButton.removeClass('disabled');
+        })
+        .catch((err) => {
+          console.log('An error occurred: ', err);
+        });
+    }
   }
   function startHeroInterval() {
     // If interval is already set, clear it.
