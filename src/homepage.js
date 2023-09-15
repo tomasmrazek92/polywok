@@ -486,6 +486,7 @@ $(document).ready(() => {
       .then(() => {
         let index = heroCurrent === 0 ? heroVisuals.length - 1 : heroCurrent - 1;
         if (!$('html, body').hasClass('overflow-hidden')) {
+          console.log(index);
           return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
         }
       })
@@ -497,7 +498,7 @@ $(document).ready(() => {
       })
       .then(() => {
         if (!$('html, body').hasClass('overflow-hidden')) {
-          return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
+          return heroVisuals.eq(heroCurrent).find(heroAnimationTrigger).trigger('click').promise();
         }
       })
       .then(() => {
@@ -833,7 +834,7 @@ let urls = [
 let urlIndex = 0;
 let split;
 
-let parentContainer = document.querySelector('#hero-stocks');
+let parentContainer = document.querySelector('.hp-feature-4_address-inner');
 
 function typeNextUrl() {
   if (urlIndex >= urls.length) {
