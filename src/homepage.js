@@ -465,8 +465,21 @@ $(document).ready(() => {
     },
   });
 
+  // --- Nav
+  let navOpen = false;
+  let scrollPosition;
+  $('.nav_button').on('click', function () {
+    if (!navOpen) {
+      scrollPosition = $(window).scrollTop();
+      $('html, body').scrollTop(0).addClass('overflow-hidden');
+      navOpen = true;
+    } else {
+      $('html, body').scrollTop(scrollPosition).removeClass('overflow-hidden');
+      navOpen = false;
+    }
+  });
+
   // Hero Carousel
-  let isScrolling;
   let heroCurrent = 0;
   let heroButton = $('.hp_hero-container-wrap .hp-flow_visual-button');
   let heroVisuals = $('.hp_hero-template');
@@ -486,7 +499,9 @@ $(document).ready(() => {
       .promise()
       .then(() => {
         let index = heroCurrent === 0 ? heroVisuals.length - 1 : heroCurrent - 1;
-        return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
+        if (!navOpen) {
+          return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
+        }
       })
       .then(() => {
         return Promise.all([
@@ -495,7 +510,9 @@ $(document).ready(() => {
         ]);
       })
       .then(() => {
-        return heroVisuals.eq(heroCurrent).find(heroAnimationTrigger).trigger('click').promise();
+        if (!navOpen) {
+          return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
+        }
       })
       .then(() => {
         return heroButton.removeClass('disabled');
@@ -726,6 +743,7 @@ $(document).ready(() => {
   });
 
   // Card 4
+  let isScrolling;
   let urls = ['leighmichaels.ai', 'leighmichaels.io', 'leighmichaels.net'];
 
   let urlIndex = 0;
@@ -810,3 +828,110 @@ $(document).ready(() => {
     false
   );
 });
+
+let isScrolling;
+let urls = [
+  '$AAPL',
+  '$MSFT',
+  '$AMZN',
+  '$NVDA',
+  '$META',
+  '$TSLA',
+  '$XOM',
+  '$BRK',
+  '$JPM',
+  '$KO',
+  '$PEP',
+];
+
+let urlIndex = 0;
+let split;
+
+let parentContainer = document.querySelector('#hero-stocks');
+
+function typeNextUrl() {
+  if (urlIndex >= urls.length) {
+    urlIndex = 0; // Restart from the first URL
+  }
+
+  let url = urls[urlIndex++];
+
+  // Create a new container for each URL
+  let container = document.createElement('div');
+  container.textContent = url + '?';
+
+  // Append the new container to the parent container
+  parentContainer.innerHTML = '';
+  parentContainer.appendChild(container);
+
+  let split = new SplitType(container, { types: 'chars' });
+
+  // Animate the characters
+  let tl = gsap.timeline();
+  tl.fromTo(
+    $(split.chars),
+    {
+      visibility: 'hidden',
+    },
+    {
+      visibility: 'visible',
+      ease: 'power2',
+      stagger: 0.15,
+    }
+  );
+  tl.to(
+    $(split.chars),
+    {
+      visibility: 'hidden',
+      ease: 'power2',
+      stagger: 0.15,
+      onComplete: () => {
+        // Function to check if isScrolling is false
+        function checkScrolling() {
+          if (!isScrolling) {
+            // Remove the function to stop the loop
+            gsap.ticker.remove(checkScrolling);
+
+            // Call Next
+            gsap.delayedCall(0, typeNextUrl);
+          }
+        }
+
+        // Add the function to the ticker
+        gsap.ticker.add(checkScrolling);
+      },
+    },
+    '+2'
+  );
+}
+
+setTimeout(function () {
+  typeNextUrl(); // Start typing
+}, 3000);
+
+// Scroll Fix
+let debounceTimer;
+
+// Function to be called after scrolling stops
+function hasStoppedScrolling() {
+  // No more scrolling
+  isScrolling = false;
+}
+
+// Listen for scroll events
+window.addEventListener(
+  'scroll',
+  function () {
+    // Scrolling is happening
+    if (!isScrolling) {
+      isScrolling = true;
+    }
+
+    // Clear the timeout if it's already been set.
+    clearTimeout(debounceTimer);
+
+    // Set a timeout to run after scrolling ends
+    debounceTimer = setTimeout(hasStoppedScrolling, 500);
+  },
+  false
+);
