@@ -813,25 +813,8 @@ $(document).ready(() => {
   );
 });
 
-let isScrolling;
-let urls = [
-  '$AAPL',
-  '$MSFT',
-  '$AMZN',
-  '$NVDA',
-  '$META',
-  '$TSLA',
-  '$XOM',
-  '$BRK',
-  '$JPM',
-  '$KO',
-  '$PEP',
-];
-
 let urlIndex = 0;
 let split;
-
-let parentContainer = document.querySelector('.hp-feature-4_address-inner');
 
 function typeNextUrl() {
   if (urlIndex >= urls.length) {
