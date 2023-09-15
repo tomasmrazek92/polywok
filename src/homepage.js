@@ -465,20 +465,6 @@ $(document).ready(() => {
     },
   });
 
-  // --- Nav
-  let navOpen = false;
-  let scrollPosition;
-  $('.nav_button').on('click', function () {
-    if (!navOpen) {
-      scrollPosition = $(window).scrollTop();
-      $('html, body').scrollTop(0).addClass('overflow-hidden');
-      navOpen = true;
-    } else {
-      $('html, body').scrollTop(scrollPosition).removeClass('overflow-hidden');
-      navOpen = false;
-    }
-  });
-
   // Hero Carousel
   let heroCurrent = 0;
   let heroButton = $('.hp_hero-container-wrap .hp-flow_visual-button');
@@ -499,7 +485,7 @@ $(document).ready(() => {
       .promise()
       .then(() => {
         let index = heroCurrent === 0 ? heroVisuals.length - 1 : heroCurrent - 1;
-        if (!navOpen) {
+        if (!$('html, body').hasClass('overflow-hidden')) {
           return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
         }
       })
@@ -510,7 +496,7 @@ $(document).ready(() => {
         ]);
       })
       .then(() => {
-        if (!navOpen) {
+        if (!$('html, body').hasClass('overflow-hidden')) {
           return heroVisuals.eq(index).find(heroAnimationTrigger).trigger('click').promise();
         }
       })
